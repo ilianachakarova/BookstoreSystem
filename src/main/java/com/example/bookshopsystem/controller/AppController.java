@@ -7,12 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Controller;
 
+import java.util.Scanner;
+
 @Controller
 public class AppController implements CommandLineRunner {
 
     private final CategoryService categoryService;
     private final AuthorService authorService;
     private final BookService bookService;
+    private Scanner scanner;
     @Autowired
     public AppController(CategoryService categoryService, AuthorService authorService, BookService bookService) {
         this.categoryService = categoryService;
@@ -46,5 +49,15 @@ public class AppController implements CommandLineRunner {
 //            System.out.println(String.format("%s %s %d",
 //                    book.getTitle(),book.getReleaseDate().toString(),book.getCopies()));
 //        });
+
+        //ex 1
+        scanner = new Scanner(System.in);
+//        String ageRestriction = scanner.nextLine();
+//        this.bookService.getAllBooksWithAgeRestriction(ageRestriction)
+//                .forEach(b-> System.out.println(b));
+        //ex.2
+
+        this.bookService.getAllBooksGoldenEditionCopiesLessThan5000()
+                .forEach(System.out::println);
     }
 }

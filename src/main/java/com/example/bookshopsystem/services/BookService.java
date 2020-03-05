@@ -10,4 +10,6 @@ public interface BookService {
     List<Book> getAllBooksAfter2000();
     List<Book> getAllBooksFromAuthorOrderByReleaseDate();
     List<Book>getAllAuthorsWithBooksAfter1990();
+    List<String>getAllBooksWithAgeRestriction(String ageRestriction);
+    List<String>getAllBooksGoldenEditionCopiesLessThan5000();
 }

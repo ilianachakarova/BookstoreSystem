@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -37,15 +38,15 @@ public class BooksServiceImpl implements BookService {
     @Override
     public void seedBooks() throws IOException {
 
-        if(this.bookRepository.count() != 0){
+        if (this.bookRepository.count() != 0) {
             return;
         }
-        String [] fileContent =
+        String[] fileContent =
                 fileUtil.readFileContent(GlobalConstants.BOOKS_FILE_PATH);
 
-        Arrays.stream(fileContent).forEach(r->{
-            String [] tokens = r.split("\\s");
-            
+        Arrays.stream(fileContent).forEach(r -> {
+            String[] tokens = r.split("\\s");
+
             //get random author
             Author author = this.getRandomAuthor();
             EditionType editionType = EditionType.values()[Integer.parseInt(tokens[0])];
@@ -55,7 +56,7 @@ public class BooksServiceImpl implements BookService {
             AgeRestriction ageRestriction = AgeRestriction.values()[Integer.parseInt(tokens[4])];
 
             String title = this.getTitle(tokens);
-            Set<Category> categories= this.getRandomCategories();
+            Set<Category> categories = this.getRandomCategories();
 
             Book book = new Book();
             book.setAuthor(author);
@@ -80,7 +81,7 @@ public class BooksServiceImpl implements BookService {
 
     @Override
     public List<Book> getAllBooksFromAuthorOrderByReleaseDate() {
-        Author author1 = this.authorService.findAuthorByFirstAndLastName("George","Powell");
+        Author author1 = this.authorService.findAuthorByFirstAndLastName("George", "Powell");
         return this.bookRepository.findAllByAuthorOrderByReleaseDateDescTitle(author1);
     }
 
@@ -91,21 +92,36 @@ public class BooksServiceImpl implements BookService {
         return bookRepository.getAllAuthorsWithAtLeastOneBookAfter1990(formatted);
     }
 
+    @Override
+    public List<String> getAllBooksWithAgeRestriction(String ageRestriction) {
+        AgeRestriction ageRestriction1 = AgeRestriction.valueOf(ageRestriction.toUpperCase());
+        List<Book> books = this.bookRepository.findAllByAgeRestrictionEquals(ageRestriction1);
+        return books.stream()
+                .map(book -> String.format("%s", book.getTitle())).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAllBooksGoldenEditionCopiesLessThan5000() {
+        List<Book> books = this.bookRepository.findAllByEditionTypeEqualsAndCopiesBefore(EditionType.valueOf("GOLD"),5000);
+        return books.stream()
+                .map(Book::getTitle).collect(Collectors.toList());
+    }
+
     private Set<Category> getRandomCategories() {
-        Set<Category>categories = new LinkedHashSet<>();
+        Set<Category> categories = new LinkedHashSet<>();
 
         Random random = new Random();
-        int bound = random.nextInt(3)+1;
-        for (int i = 0; i <bound ; i++) {
-            int categoryId =random.nextInt(8)+1;
-                    categories.add(categoryService.findCategoryById(categoryId));
+        int bound = random.nextInt(3) + 1;
+        for (int i = 0; i < bound; i++) {
+            int categoryId = random.nextInt(8) + 1;
+            categories.add(categoryService.findCategoryById(categoryId));
         }
         return categories;
     }
 
     private String getTitle(String[] tokens) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 5; i <tokens.length ; i++) {
+        for (int i = 5; i < tokens.length; i++) {
             sb.append(tokens[i]).append(" ");
         }
 
@@ -115,15 +131,16 @@ public class BooksServiceImpl implements BookService {
     private Author getRandomAuthor() {
         Random random = new Random();
 
-        int randomId = random.nextInt(authorService.getAllAuthorsCount())+1;
+        int randomId = random.nextInt(authorService.getAllAuthorsCount()) + 1;
 
         Author randomAuthor = this.authorService.findAuthorById(randomId);
 
         return randomAuthor;
     }
-    private LocalDate formatDate(String date){
+
+    private LocalDate formatDate(String date) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d/M/yyyy");
-        LocalDate formattedDate = LocalDate.parse(date,dateTimeFormatter);
+        LocalDate formattedDate = LocalDate.parse(date, dateTimeFormatter);
         return formattedDate;
     }
 }
