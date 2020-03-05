@@ -57,7 +57,9 @@ public class AppController implements CommandLineRunner {
 //                .forEach(b-> System.out.println(b));
         //ex.2
 
-        this.bookService.getAllBooksGoldenEditionCopiesLessThan5000()
-                .forEach(System.out::println);
+//        this.bookService.getAllBooksGoldenEditionCopiesLessThan5000()
+//                .forEach(System.out::println);
+
+        this.bookService.getAllBooksWithPriceLower5Bigger40().forEach(System.out::println);
     }
 }

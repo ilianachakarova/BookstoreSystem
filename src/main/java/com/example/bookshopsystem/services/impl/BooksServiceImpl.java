@@ -107,6 +107,16 @@ public class BooksServiceImpl implements BookService {
                 .map(Book::getTitle).collect(Collectors.toList());
     }
 
+    @Override
+    public List<String> getAllBooksWithPriceLower5Bigger40() {
+        List<Book> books = this.bookRepository.
+                findAllByPriceBeforeOrPriceAfter(BigDecimal.valueOf(5),BigDecimal.valueOf(40));
+        return books.stream().
+                map(book -> String.format("%s - $%.2f", book.getTitle(),
+                        book.getPrice())).
+                collect(Collectors.toList());
+    }
+
     private Set<Category> getRandomCategories() {
         Set<Category> categories = new LinkedHashSet<>();
 
