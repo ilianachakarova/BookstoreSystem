@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthorServiceImpl implements AuthorService {
@@ -58,6 +59,21 @@ public class AuthorServiceImpl implements AuthorService {
     public Author findAuthorByFirstAndLastName(String firstName, String lastName) {
         return authorRepository.findByFirstNameAndLastName(firstName,lastName);
     }
+
+    @Override
+    public List<String> findAuthorNamesEndingWith(String chars) {
+        List<Author> authors = this.authorRepository.findAllByFirstNameEndingWith(chars);
+        return authors.stream().map(author -> String.format("%s %s",
+                author.getLastName(),author.getLastName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> findTotalBookCopiesPerAuthor() {
+        return this.authorRepository.findTotalBookCopiesPerAuthor()
+                .stream().map(a->String.format("%s - %s",a[0],String.valueOf(a[1]))).collect(Collectors.toList());
+    }
+
 
 //    @Override
 //    public List<Author> findAuthorsWithAtLeastOneBookBefore1990() {

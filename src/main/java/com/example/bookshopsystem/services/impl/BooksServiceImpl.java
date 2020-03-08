@@ -117,6 +117,66 @@ public class BooksServiceImpl implements BookService {
                 collect(Collectors.toList());
     }
 
+    @Override
+    public List<String> getAllBooksNotReleasedInYear(String year) {
+        LocalDate startDate = formatDate(String.format("1/1/%s",year));
+        LocalDate endDate = formatDate(String.format("31/12/%s",year));
+        List<Book> books = this.bookRepository.findAllByReleaseDateBeforeOrReleaseDateAfter(startDate,endDate);
+
+        return books.stream().map(Book::getTitle).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAllBooksReleasedBeforeDate(String date) {
+        LocalDate formattedDate = this.formatUSDate(date);
+        List<Book> books = this.bookRepository.findAllByReleaseDateBefore(formattedDate);
+        return books.stream().map(book -> String.format("%s %s - $%.2f", book.getTitle(),
+                book.getEditionType().name().toLowerCase(), book.getPrice())).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAllBooksContaining(String chars) {
+        List<Book> books = this.bookRepository.findAllByTitleContaining(chars);
+        return books.stream().map(Book::getTitle).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAllBooksByAuthorLastNameStartingWith(String str) {
+       List<Book> books = this.bookRepository.findBooksByAuthorLastName(str);
+        return books.stream().map(book -> String.format("%s (%s %s)",
+                book.getTitle(),book.getAuthor().getFirstName(), book.getAuthor().getLastName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public int getAllBooksWhoseTitleIsLongerThan(int number) {
+        return this.bookRepository.findBooksByTitleLengthGreaterThan(number).size();
+    }
+
+
+    @Override
+    public int updateBookCopiesAfterDate(String date, int copies) {
+        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd MMM yyyy"));
+        return this.bookRepository.updateAllBooksAfterGivenDate(localDate, copies);
+    }
+
+    @Override
+    public String printInfoReducedBook(String title) {
+        Book book = this.bookRepository.findBooksByTitleEquals(title);
+        if(book == null){
+            return null;
+        }else {
+            return String.format("%s %s %s %.2f", book.getTitle(), book.getEditionType().name(),
+                    book.getAgeRestriction().name(), book.getPrice());
+        }
+
+    }
+
+    @Override
+    public int removeBooksWithCopiesLessThan(int minCopies) {
+        return this.bookRepository.removeBooksWithLessCopiesThan(minCopies);
+    }
+
     private Set<Category> getRandomCategories() {
         Set<Category> categories = new LinkedHashSet<>();
 
@@ -151,6 +211,12 @@ public class BooksServiceImpl implements BookService {
     private LocalDate formatDate(String date) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d/M/yyyy");
         LocalDate formattedDate = LocalDate.parse(date, dateTimeFormatter);
+        return formattedDate;
+    }
+
+    private LocalDate formatUSDate(String date){
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate formattedDate = LocalDate.parse(date,dateTimeFormatter);
         return formattedDate;
     }
 }

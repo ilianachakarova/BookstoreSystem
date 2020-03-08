@@ -18,6 +18,7 @@ public interface AuthorService {
     Author findAuthorByFirstAndLastName(String firstName, String lastName);
 
    // List<Author> findAuthorsWithAtLeastOneBookBefore1990();
-
+    List<String> findAuthorNamesEndingWith(String chars);
+    List<String>findTotalBookCopiesPerAuthor();
 
 }

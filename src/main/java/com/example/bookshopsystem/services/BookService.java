@@ -13,4 +13,12 @@ public interface BookService {
     List<String>getAllBooksWithAgeRestriction(String ageRestriction);
     List<String>getAllBooksGoldenEditionCopiesLessThan5000();
     List<String> getAllBooksWithPriceLower5Bigger40();
+    List<String> getAllBooksNotReleasedInYear(String year);
+    List<String> getAllBooksReleasedBeforeDate(String date);
+    List<String> getAllBooksContaining(String chars);
+    List<String>getAllBooksByAuthorLastNameStartingWith(String str);
+    int getAllBooksWhoseTitleIsLongerThan(int number);
+    int updateBookCopiesAfterDate(String date, int copies);
+    String printInfoReducedBook(String title);
+    int removeBooksWithCopiesLessThan(int minCopies);
 }

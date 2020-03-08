@@ -82,7 +82,7 @@ public class Book extends BaseEntity {
         this.ageRestriction = ageRestriction;
     }
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
 
     public Set<Category> getCategories() {
         return categories;
